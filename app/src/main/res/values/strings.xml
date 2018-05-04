@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">SmartScanner</string>
+    <string name="external_storage_not_read_ready">External Storage is not read ready, please make
+        sure its mounted properly!</string>
+    <string name="notification_text">Scanning Files on SD card...</string>
+    <string name="scan_completed">Scanning Completed</string>
+    <string name="stop">STOP</string>
+    <string name="start">START SCAN</string>
+    <string name="rescan_message">Scanning stopped.\n Click START SCAN button to start again</string>
+    <string name="scanning_stopped">Scanning Stopped</string>
+    <string name="scanning_interupped">Scanning Interrupted</string>
+    <string name="permission_denied">Permission denied, rescan by clicking START SCAN button</string>
+</resources>
