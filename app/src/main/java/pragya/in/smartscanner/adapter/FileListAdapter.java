@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
@@ -20,10 +21,12 @@ import pragya.in.smartscanner.utils.FileUtils;
 public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.ViewHolder> {
 
     private List<FileInfo> items;
+    private long totalSpace;
 
 
-    public FileListAdapter(List<FileInfo> items) {
+    public FileListAdapter(List<FileInfo> items, long totalSpace) {
         this.items = items;
+        this.totalSpace = totalSpace;
     }
 
     @Override
@@ -31,7 +34,10 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.ViewHo
         FileInfo item = items.get(position);
         if (holder != null) {
             holder.itemName.setText(item.getName());
-            holder.itemSize.setText("Size: " + FileUtils.getFileSize(item.getSize()));
+            holder.itemSize.setText(FileUtils.getFileSize(item.getSize()));
+            holder.progressBar.setMax((int) totalSpace);
+            holder.progressBar.setProgress((int) item.getSize());
+
         }
     }
 
@@ -53,11 +59,14 @@ public class FileListAdapter extends RecyclerView.Adapter<FileListAdapter.ViewHo
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView itemName, itemSize;
+        ProgressBar progressBar;
+
 
         ViewHolder(View view) {
             super(view);
             itemName = view.findViewById(R.id.tv_item_name);
             itemSize = view.findViewById(R.id.tv_item_size);
+            progressBar = view.findViewById(R.id.progressBar);
 
         }
     }

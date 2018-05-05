@@ -7,7 +7,7 @@ import java.text.DecimalFormat;
  */
 public class FileUtils {
     public static String getFileExt(String fileName) {
-        String ext = "";
+        String ext = "other";
         int dotPos = fileName.lastIndexOf(".");
         if (dotPos != -1) {
             return fileName.substring(dotPos + 1);

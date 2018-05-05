@@ -26,7 +26,7 @@ public class ExtensionListAdapter extends RecyclerView.Adapter<ExtensionListAdap
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.items_row, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.items_extension, parent, false);
         return new ViewHolder(view);
     }
 
@@ -35,7 +35,7 @@ public class ExtensionListAdapter extends RecyclerView.Adapter<ExtensionListAdap
         ExtInfo item = items.get(position);
         if (holder != null) {
             holder.itemName.setText(item.getName());
-            holder.itemSize.setText("Frequencies: " + item.getFrequence());
+            holder.itemSize.setText(String.format("%d", item.getFrequence()));
         }
     }
 

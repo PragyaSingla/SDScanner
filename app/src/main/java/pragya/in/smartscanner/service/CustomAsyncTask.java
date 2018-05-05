@@ -9,6 +9,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.github.lzyzsd.circleprogress.ArcProgress;
+
 import pragya.in.smartscanner.R;
 
 /**
@@ -20,6 +22,7 @@ public abstract class CustomAsyncTask<Params, Progress, Result> extends AsyncTas
     private AsynkTaskListener asynkTaskListener = null;
     private Context mContext;
     private ProgressBar progressBar;
+    private ArcProgress arc_progress;
     private int length;
 
     public interface AsynkTaskListener {
@@ -30,9 +33,12 @@ public abstract class CustomAsyncTask<Params, Progress, Result> extends AsyncTas
         this.mContext = mContext;
         progressBar = layoutProgress.findViewById(R.id.progressBar);
         textViewProgress = layoutProgress.findViewById(R.id.textViewProgress);
+        arc_progress = layoutProgress.findViewById(R.id.arc_progress);
         length = new FileScanner().getAllFilesLength(Environment.getExternalStorageDirectory().getAbsolutePath());
         progressBar.setMax(length);
         progressBar.setProgress(0);
+        arc_progress.setMax(100);
+        arc_progress.setProgress(0);
     }
 
     public void setAsynkTaskListener(AsynkTaskListener asynkTaskListener) {
@@ -48,14 +54,14 @@ public abstract class CustomAsyncTask<Params, Progress, Result> extends AsyncTas
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        progressBar.setVisibility(View.VISIBLE);
+        arc_progress.setVisibility(View.VISIBLE);
 
     }
 
     @Override
     protected void onPostExecute(Result result) {
         super.onPostExecute(result);
-        progressBar.setVisibility(View.GONE);
+        arc_progress.setVisibility(View.GONE);
 
         doTaskPerformed();
     }
@@ -67,6 +73,7 @@ public abstract class CustomAsyncTask<Params, Progress, Result> extends AsyncTas
         progressBar.setProgress(value);
         double progress = (double) value / length * 100;
         textViewProgress.setText((int) progress + "%");
+        arc_progress.setProgress((int) progress);
 
     }
 

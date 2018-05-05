@@ -2,6 +2,7 @@ package pragya.in.smartscanner.ui;
 
 import android.Manifest;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -15,6 +16,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
@@ -75,6 +77,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @BindView(R.id.textMessage)
     TextView textMessage;
 
+    @BindView(R.id.layoutStartUp)
+    LinearLayout layoutStartUp;
+
     private FileScannerTask fileScannerTask;
     private SDInfo sdInfo;
     private FileListAdapter mAdapter;
@@ -82,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean isFinished = false;
     private boolean isStarted = false;
     private int selectedTabPosition = 0;
+    private NotificationManager mNotificationManager;
 
 
     @Override
@@ -91,7 +97,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ButterKnife.bind(this);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        checkPermissionsAndScanStorage();
+        buttonShare.getBackground().setColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+        mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        //checkPermissionsAndScanStorage();
 
         setUpListener();
 
@@ -169,14 +178,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private void showNotification(String title) {
-
+        Intent notifyIntent = new Intent(this, MainActivity.class);
+        PendingIntent notifyPendingIntent = PendingIntent.getActivity(
+                this, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT
+        );
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "")
                 .setSmallIcon(R.mipmap.ic_launcher_round)
                 .setContentTitle(title)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setAutoCancel(true);
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                .setAutoCancel(true)
+                .setContentIntent(notifyPendingIntent);
         mNotificationManager.notify(0, mBuilder.build());
 
 
@@ -195,6 +206,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             buttonStart.setText(R.string.stop);
             textMessage.setText("");
             sdInfo = null;
+
+            recyclerView.setVisibility(View.VISIBLE);
         } else {
             layoutProgress.setVisibility(View.GONE);
             buttonStart.setText(R.string.start);
@@ -211,8 +224,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private RecyclerView.Adapter getFileListAdapter() {
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         if (mAdapter == null) {
-            mAdapter = new FileListAdapter(sdInfo.getFileInfoList());
+            mAdapter = new FileListAdapter(sdInfo.getFileInfoList(), Utils.getTotalExternalStorageSpace());
         } else {
             mAdapter.setItems(sdInfo.getFileInfoList());
             mAdapter.notifyDataSetChanged();
@@ -223,6 +237,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     private RecyclerView.Adapter getExtensionListAdapter() {
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         if (mAdapterExtensions == null) {
             mAdapterExtensions = new ExtensionListAdapter(sdInfo.getExtInfoList());
         } else {
@@ -248,6 +263,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (view == buttonStart) {
             checkPermissionsAndScanStorage();
             updateScanButton();
+            layoutStartUp.setVisibility(View.GONE);
         } else if (view == buttonShare) {
             share();
         }
@@ -295,7 +311,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onBackPressed() {
-
         stopScan(getString(R.string.scanning_interupped));
         super.onBackPressed();
     }
@@ -325,5 +340,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
         }
+    }
+
+    @Override
+    protected void onStop() {
+
+        showNotification(getString(R.string.scanning_interupped));
+        if (mNotificationManager != null)
+            mNotificationManager.cancel(0);
+        super.onStop();
     }
 }
